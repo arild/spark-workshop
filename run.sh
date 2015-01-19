@@ -1,0 +1,2 @@
+#!/bin/sh
+sbt "run 8md3Zmht0qzOmfB3dtoY07KWp 9k3vLru7ZnZpDbVpqZLN4bBbIxlflBGjumZFSy4XpuYbgVvwYx 121713553-cX3N1LodCWjHvJVDm1XEE80L1wkWNllGroAmq7qQ PGm2TBcWUWy4uA9JMAlvnSPjUYQFD3Wj1NWqDNLqjCCAe"
