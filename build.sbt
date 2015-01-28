@@ -1,12 +1,19 @@
 name := "Spark workshop"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "1.2.0"
 
 libraryDependencies += "org.apache.spark" % "spark-streaming_2.11" % "1.2.0"
 
-libraryDependencies += "org.apache.spark" % "spark-streaming-twitter_2.11" % "1.2.0"
+libraryDependencies += "org.apache.spark" % "spark-streaming-twitter_2.11" % "1.2.0" exclude("org.eclipse.jetty", "jetty-server")
+
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "1.2.0"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.3" % "test"
 
+libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.10"
+
+//parallelExecution in Test := false
+
+fork in Test := true
