@@ -15,7 +15,7 @@ class LogLineCountTest extends SparkTestUtils with Matchers {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
     import sqlContext.createSchemaRDD
 
-    val logLines = sc.textFile("src/test/resources/application.log")
+    val logLines = sc.textFile("src/test/resources/application-1.log")
       .flatMap(LogLineCount.parseLogLine)
     logLines.registerTempTable("loglines")
 

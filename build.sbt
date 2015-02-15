@@ -1,6 +1,6 @@
 name := "Spark workshop"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.2"
 
 libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "1.2.0"
 

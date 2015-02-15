@@ -1,0 +1,12 @@
+INFO - Application fully started
+INFO - User id=23 failed login: invalid credentials
+INFO - User id=23 successful login
+ERROR - Exception in thread "main" java.lang.NullPointerException
+        at com.example.myproject.security.checkCredentials(Authentication.java:16)
+INFO - User id=55 successful login 
+INFO - User id=23 successful logout
+INFO - User id=102 successful login
+ERROR - Exception in thread "main" java.lang.NullPointerException
+        at com.example.myproject.Book.getTitle(Book.java:16)
+        at com.example.myproject.Author.getBookTitles(Author.java:25)
+        at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
