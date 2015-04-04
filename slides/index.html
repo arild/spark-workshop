@@ -69,7 +69,7 @@ URL: https://code.google.com/p/io-2012-slides
             </ul>
         </article>
     </slide>
-
+    
     <slide>
         <hgroup>
             <h2>Outline</h2>
@@ -102,6 +102,37 @@ URL: https://code.google.com/p/io-2012-slides
                 <li>Part 2 - Spark SQL</li>
                 <li>Part 3 - Spark Streaming</li>
             </ul>
+        </article>
+    </slide>
+
+    <slide>
+        <hgroup>
+            <h2>RDD (Resillient Distributed Dataset)</h2>
+        </hgroup>
+        <article class="large">
+            <ul>
+                <li>Core concept in Spark</li>
+                <li>Spark automatically distributes data and parallelizes operations on RDDs</li>
+                <li>Transformations vs. actions</li>
+            </ul>
+        </article>
+    </slide>
+
+    <slide>
+        <hgroup>
+            <h2>Reading and filtering files</h2>
+        </hgroup>
+        <article class="large">
+            
+            <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
+val lines: RDD[String] = sc.textFile("application.log")
+
+val result: Array[String] = lines
+  .filter(line => line.startsWith("INFO")) // Transformation (returns new RDD)
+  .collect() // Action
+
+result.foreach(println)
+            </pre>
         </article>
     </slide>
 
