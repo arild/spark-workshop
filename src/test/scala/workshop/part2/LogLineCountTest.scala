@@ -1,6 +1,6 @@
 package workshop.part2
 
-import org.apache.spark.sql.SchemaRDD
+import org.apache.spark.sql.{DataFrame, SchemaRDD}
 import org.scalatest._
 import workshop.util.SparkTestUtils
 
@@ -11,16 +11,16 @@ class LogLineCountTest extends SparkTestUtils with Matchers {
   }
 
   def openLogFile: Long = {
-
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    import sqlContext.createSchemaRDD
+    import sqlContext.implicits._
 
     val logLines = sc.textFile("src/test/resources/application-1.log")
       .flatMap(LogLineCount.parseLogLine)
-    logLines.registerTempTable("loglines")
+      .toDF()
+      .registerTempTable("loglines")
+    val sql: DataFrame = sqlContext.sql("select level, count(*) from loglines group by level order by 2 desc")
 
-    val sql: SchemaRDD = sqlContext.sql("select level, count(*) from loglines group by level order by 2 desc")
-    val a: Array[Long] = sql.filter(x => x.getString(0) == "ERROR").map(x => x.getLong(1)).collect()
+    val a: Array[Long] = sql.filter(sql("level") === "ERROR").map(x => x.getLong(1)).collect()
     a(0)
   }
 
