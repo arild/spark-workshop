@@ -26,11 +26,12 @@ class LogAnalyzerTest extends SparkTestUtils with Matchers {
     numLines should be (7)
   }
   
-  sparkTest("count number of info and error lines") {
-    val (numInfo, numError) = LogAnalyzer.countNumberOfInfoAndErrorLines(openAppLog(APP_LOG_1))
+  sparkTest("find theree most frequent words") {
+    val words = LogAnalyzer.findThreeMostFrequentWords(openAppLog(APP_LOG_1))
 
-    numInfo should be (6)
-    numError should be (2)
+    words should contain ("-")
+    words should contain ("INFO")
+    words should contain ("User")
   }
   
   sparkTest("find first line of longest exception") {

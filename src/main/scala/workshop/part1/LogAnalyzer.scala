@@ -17,20 +17,15 @@ object LogAnalyzer {
     lines1.union(lines2).distinct().filter(isInfo).count()
   }
 
-  def countNumberOfInfoAndErrorLines(lines: RDD[String]): (Long, Long) = {
-    val counted = lines.filter(l => isInfo(l) || isError(l))
-      .map(l => {
-        if (isInfo(l)) ("INFO", 1)
-        else ("ERROR", 1)
-       })
-      .reduceByKey((r, c) => r + c)
+  def findThreeMostFrequentWords(lines: RDD[String]): Array[String] = {
+    lines.flatMap(line => line.split(" "))
+      .filter(!_.isEmpty)
+      .map(name => (name, 1))
+      .reduceByKey(_ + _)
+      .map { case (word, count) => (count, word) }
       .sortByKey(ascending = false)
-      .map(_._2)
-      .collect()
-    
-    counted match {
-      case Array(countInfo, countError) => (countInfo, countError)
-    }
+      .take(3)
+      .map { case (count, word) => word }
   }
 
   def findFirstLineOfLongestException(lines1: RDD[String], lines2: RDD[String]): String = {
