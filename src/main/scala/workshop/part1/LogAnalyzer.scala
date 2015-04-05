@@ -1,7 +1,7 @@
 package workshop.part1
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.SparkContext._
+
 
 object LogAnalyzer {
 
@@ -14,18 +14,34 @@ object LogAnalyzer {
   }
 
   def countAllUniqueInfoLines(lines1: RDD[String], lines2: RDD[String]): Long = {
-    lines1.union(lines2).distinct().filter(isInfo).count()
+    lines1.union(lines2)
+      .distinct()
+      .filter(isInfo)
+      .count()
+  }
+
+  def findNumWordsOccurringInBothFiles(lines1: RDD[String], lines2: RDD[String]): Long = {
+    toWords(lines1)
+      .intersection(toWords(lines2))
+      .count()
+  }
+
+  def findNumWordsOccurringMoreThanOnce(lines1: RDD[String], lines2: RDD[String]): Long = {
+    toWords(lines1.union(lines2))
+      .map(word => (word, 1))
+      .reduceByKey(_ + _)
+      .filter { case (word, count) => count > 1 }
+      .count()
   }
 
   def findThreeMostFrequentWords(lines: RDD[String]): Array[String] = {
-    lines.flatMap(line => line.split(" "))
-      .filter(!_.isEmpty)
-      .map(name => (name, 1))
+    toWords(lines)
+      .map(word => (word, 1))
       .reduceByKey(_ + _)
-      .map { case (word, count) => (count, word) }
+      .map { tuple => tuple.swap }
       .sortByKey(ascending = false)
       .take(3)
-      .map { case (count, word) => word }
+      .map { case (_, word) => word }
   }
 
   def findFirstLineOfLongestException(lines1: RDD[String], lines2: RDD[String]): String = {
@@ -52,11 +68,15 @@ object LogAnalyzer {
     sorted.head.head
   }
 
+  private def isInfo(line: String) = {
+    line.startsWith("INFO - ")
+  }
+
   private def isError(line: String) = {
     line.startsWith("ERROR - ")
   }
 
-  private def isInfo(line: String) = {
-    line.startsWith("INFO - ")
+  private def toWords(lines: RDD[String]) = {
+    lines.flatMap(line => line.split(" ")).filter(!_.isEmpty)
   }
 }

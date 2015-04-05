@@ -25,15 +25,27 @@ class LogAnalyzerTest extends SparkTestUtils with Matchers {
 
     numLines should be (7)
   }
-  
-  sparkTest("find theree most frequent words") {
+
+  sparkTest("find num words occurring in both files") {
+    val num = LogAnalyzer.findNumWordsOccurringInBothFiles(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+
+    num should be (10)
+  }
+
+  sparkTest("find num words occurring more than once") {
+    val num = LogAnalyzer.findNumWordsOccurringMoreThanOnce(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+
+    num should be (16)
+  }
+
+  sparkTest("find three most frequent words") {
     val words = LogAnalyzer.findThreeMostFrequentWords(openAppLog(APP_LOG_1))
 
     words should contain ("-")
     words should contain ("INFO")
     words should contain ("User")
   }
-  
+
   sparkTest("find first line of longest exception") {
     val line = LogAnalyzer.findFirstLineOfLongestException(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
     
