@@ -129,12 +129,43 @@ val lines: RDD[String] = sc.textFile("application.log")
 
 val result: Array[String] = lines
   .filter(line => line.startsWith("INFO")) // Transformation (returns new RDD)
-  .collect() // Action
-
-result.foreach(println)
-            </pre>
+  .collect() // Action (compute result)</pre>
         </article>
     </slide>
+
+    <slide>
+        <hgroup>
+            <h2>Set operations</h2>
+        </hgroup>
+        <article class="large">
+            <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
+val lines1: RDD[String] = sc.textFile("src/test/resources/application-1.log")
+val lines2: RDD[String] = sc.textFile("src/test/resources/application-2.log")
+
+lines1.intersection(lines2)
+  .foreach(line => {
+    // Write to external storage e.g.
+  })</pre>
+        </article>
+    </slide>
+
+    <slide>
+        <hgroup>
+            <h2>Word count</h2>
+        </hgroup>
+        <article class="large">
+            <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
+val lines: RDD[String] = sc.textFile("src/test/resources/application.log")
+
+val words: Array[(String, Int)] = lines
+  .flatMap(line => line.split(" "))
+  .filter(!_.isEmpty)
+  .map(word => (word, 1))
+  .reduceByKey((a, b) => a + b)
+  .take(10)</pre>
+        </article>
+    </slide>
+
 
     <slide>
         <hgroup>
@@ -143,15 +174,16 @@ result.foreach(println)
         <article class="large">
             <ul>
                <li>git clone <a href="https://github.com/arild/spark-workshop.git">https://github.com/arild/spark-workshop.git</a></li>
-               <li>Implement Xyz</li>
-               <li>Make tests in XyzTest green</li>
+               <li>Implement LogAnalyzer</li>
+               <li>Make tests in LogAnalyzerTest green</li>
             </ul>
             <br>
 
             <ul>
                 <li>Docs:
                     <ul>
-                        <li>Spark Core<a style="margin-left: 1em" href="http://spark.apache.org/docs/1.2.0/programming-guide.html">http://spark.apache.org/docs/1.2.0/programming-guide.html</a></li>
+                        <li><a style="margin-left: 1em" href="http://spark.apache.org/docs/1.3.0/programming-guide.html">Spark Core programming guide</a></li>
+                        <li><a style="margin-left: 1em" href="http://spark.apache.org/docs/1.3.0/programming-guide.html#transformations">Transformations & Actions</a></li>
                     </ul>
                 </li>
             </ul>
@@ -160,20 +192,17 @@ result.foreach(println)
 
     <slide>
         <hgroup>
-            <h2>Exercises - Running tests in SBT</h2>
+            <h2>Running tests in SBT</h2>
         </hgroup>
         <article class="large">
             <ul>
-                <li>Running multiple test classes<br /><br />
+                <li>Run all tests<br /><br />
                 <pre class="prettyprint">$ ./sbt
-> test-only workshop.part1.ComputeActorTest workshop.part2.ComputeSupervisorTest</pre>
+> test</pre>
                 </li>
-                <li>Using wildcards and ~ (autorun)<br /><br />
+                <li>Autorun (~) part1 tests<br /><br />
                     <pre class="prettyprint">$ ./sbt
-> ~test-only workshop.part2*Test</pre></li>
-                <li>Continuously run the part1 tests<br /><br />
-                    <pre class="prettyprint">$ ./sbt
-> ~test-only workshop.part1.ComputeActorTest</pre></li>
+> ~test-only workshop.part1.*</pre></li>
             </ul>
         </article>
     </slide>
@@ -205,7 +234,7 @@ result.foreach(println)
             <ul>
                 <li>Docs:
                     <ul>
-                        <li>Spark Core<a style="margin-left: 1em" href="http://spark.apache.org/docs/1.2.0/programming-guide.html">http://spark.apache.org/docs/1.2.0/programming-guide.html</a></li>
+                        <li><a style="margin-left: 1em" href="http://spark.apache.org/docs/1.2.0/programming-guide.html">http://spark.apache.org/docs/1.2.0/programming-guide.html</a></li>
                     </ul>
                 </li>
             </ul>
