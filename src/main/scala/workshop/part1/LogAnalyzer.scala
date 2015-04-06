@@ -9,11 +9,11 @@ object LogAnalyzer {
     lines.filter(isError).count()
   }
 
-  def collectUniqueInfoLines(lines: RDD[String]): Array[String] = {
+  def collectDistinctInfoLines(lines: RDD[String]): Array[String] = {
     lines.filter(isInfo).distinct().collect()
   }
 
-  def countAllUniqueInfoLines(lines1: RDD[String], lines2: RDD[String]): Long = {
+  def countAllDistinctInfoLines(lines1: RDD[String], lines2: RDD[String]): Long = {
     lines1.union(lines2)
       .distinct()
       .filter(isInfo)

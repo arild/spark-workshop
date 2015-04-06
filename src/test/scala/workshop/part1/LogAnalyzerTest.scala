@@ -13,15 +13,15 @@ class LogAnalyzerTest extends SparkTestUtils with Matchers {
     LogAnalyzer.countNumberOfErrors(openAppLog(APP_LOG_1)) should be (2)
   }
 
-  sparkTest("collect unique info lines") {
-    val logLines = LogAnalyzer.collectUniqueInfoLines(openAppLog(APP_LOG_1))
+  sparkTest("collect distinct info lines") {
+    val logLines = LogAnalyzer.collectDistinctInfoLines(openAppLog(APP_LOG_1))
     
     logLines.size should be(6)
     logLines contains "INFO - User id=23 successful login"
   }
   
-  sparkTest("count all unique info lines") {
-    val numLines = LogAnalyzer.countAllUniqueInfoLines(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+  sparkTest("count all distinct info lines") {
+    val numLines = LogAnalyzer.countAllDistinctInfoLines(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
 
     numLines should be (7)
   }
