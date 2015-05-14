@@ -2,7 +2,7 @@ package workshop.part2
 
 import org.apache.spark.sql.{DataFrame, Row}
 
-object LogAnalyzerSql2 {
+object LogAnalyzerSql {
   def sumBytesPerRequest(df: DataFrame): Map[String, Double] = {
 
     df.sqlContext.sql(

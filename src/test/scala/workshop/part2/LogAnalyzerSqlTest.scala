@@ -1,34 +1,47 @@
 package workshop.part2
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{SQLContext, DataFrame}
 import org.scalatest._
 import workshop.util.SparkTestUtils
+import workshop.util.parser.{HttpStatusCode, AccessLogParser}
 
 class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
 
-
-  val APP_LOG_1 = "src/test/resources/application-1.log"
-  val APP_LOG_2 = "src/test/resources/application-2.log"
-
-  sparkTest("count number of error lines") {
-    LogAnalyzerSql.countNumberOfErrors(openLogFile(APP_LOG_1)) should be (2)
+  sparkTest("count stuff") {
+    val file: RDD[String] = sc.textFile("access_log")
+    val dataFrame: DataFrame = openLogFile(file)
+    LogAnalyzerSql.countStatus200Loglines(dataFrame) shouldBe 1274
+    println(LogAnalyzerSql.countLoglinesByStatuscodes(dataFrame))
+    println(LogAnalyzerSql.sumBytesPerRequest(dataFrame))
   }
 
-  sparkTest("collect distinct info lines") {
-    val logLines = LogAnalyzerSql.collectDistinctInfoLines(openLogFile(APP_LOG_1))
-
-    logLines.size should be(6)
-    logLines contains "INFO - User id=23 successful login"
-  }
-
-  def openLogFile(file: String): DataFrame = {
-    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+  def openLogFile(rdd: RDD[String]): DataFrame = {
+    val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
-    val df = sc.textFile("src/test/resources/application-1.log")
-      .flatMap(LogAnalyzerSql.parseLogLine)
+    val parser: AccessLogParser = new AccessLogParser()
+
+    openHttpStatusFile(sqlContext)
+
+    val df = rdd
+      .map(line => parser.parseRecordReturningNullObjectOnFailure(line))
       .toDF()
-    df.registerTempTable("loglines")
+    df.registerTempTable("logs")
     df
+  }
+
+  def openHttpStatusFile(sqlContext: SQLContext): Unit = {
+    import sqlContext.implicits._
+
+    val lines: RDD[Array[String]] = sc.textFile("src/test/resources/http_status_codes.csv")
+      .map(line => line.split(",").map(_.trim))
+
+    val header: Array[String] = lines.first()
+    val data: RDD[Array[String]] = lines.filter(_(0) != header(0))
+    data
+      .map(x => HttpStatusCode(x(0).toInt, x(1), x(2)))
+      .toDF()
+      .registerTempTable("http_status")
   }
 }
