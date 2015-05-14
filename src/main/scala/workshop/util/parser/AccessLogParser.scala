@@ -1,4 +1,4 @@
-package workshop.parser
+package workshop.util.parser
 
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -86,7 +86,7 @@ object AccessLogParser {
     val nullObjectAccessLogRecord = AccessLogRecord("", "", "", "", "", "", "")
     
     /**
-     * @param A String like "GET /the-uri-here HTTP/1.1"
+     * @param request A String like "GET /the-uri-here HTTP/1.1"
      * @return A Tuple3(requestType, uri, httpVersion). requestType is GET, POST, etc.
      * 
      * Returns a Tuple3 of three blank strings if the method fails.
@@ -97,7 +97,7 @@ object AccessLogParser {
     }
     
     /**
-     * @param A String that looks like "[21/Jul/2009:02:48:13 -0700]"
+     * @param field A String that looks like "[21/Jul/2009:02:48:13 -0700]"
      */
     def parseDateField(field: String): Option[java.util.Date] = {
         val dateRegex = "\\[(.*?) .+]"

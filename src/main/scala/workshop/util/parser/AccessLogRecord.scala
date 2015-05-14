@@ -1,4 +1,4 @@
-package workshop.parser
+package workshop.util.parser
 
 /**
  * @see http://httpd.apache.org/docs/2.2/logs.html for details

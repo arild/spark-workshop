@@ -1,7 +1,7 @@
 package workshop.part1
 
 import org.apache.spark.rdd.RDD
-import workshop.parser.AccessLogRecord
+import workshop.util.parser.AccessLogRecord
 
 
 object LogAnalyzer {

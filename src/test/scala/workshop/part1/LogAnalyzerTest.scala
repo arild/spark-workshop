@@ -2,7 +2,7 @@ package workshop.part1
 
 import org.apache.spark.rdd.RDD
 import org.scalatest._
-import workshop.parser.{AccessLogParser, AccessLogRecord}
+import workshop.util.parser.{AccessLogParser, AccessLogRecord}
 import workshop.util.SparkTestUtils
 
 class LogAnalyzerTest extends SparkTestUtils with Matchers {
