@@ -2,57 +2,59 @@ package workshop.part1
 
 import org.apache.spark.rdd.RDD
 import org.scalatest._
+import workshop.parser.{AccessLogParser, AccessLogRecord}
 import workshop.util.SparkTestUtils
 
 class LogAnalyzerTest extends SparkTestUtils with Matchers {
 
-  val APP_LOG_1 = "src/test/resources/application-1.log"
-  val APP_LOG_2 = "src/test/resources/application-2.log"
-   
-  sparkTest("count number of error lines") {
-    LogAnalyzer.countNumberOfErrors(openAppLog(APP_LOG_1)) should be (2)
+  val ACCESS_LOG_1 = "src/test/resources/access_log-1"
+  val ACCESS_LOG_2 = "src/test/resources/access_log-2"
+
+  sparkTest("count number of status codes") {
+    LogAnalyzer.countNumberOfStatusCode(openAccessLog(ACCESS_LOG_1), "200") should be (21)
+    LogAnalyzer.countNumberOfStatusCode(openAccessLog(ACCESS_LOG_1), "401") should be (6)
   }
 
-  sparkTest("collect distinct info lines") {
-    val logLines = LogAnalyzer.collectDistinctInfoLines(openAppLog(APP_LOG_1))
+  sparkTest("collect distinct ip addresses for status code") {
+    val logLines = LogAnalyzer.collectDistinctIpAddressesForStatusCode(openAccessLog(ACCESS_LOG_1), "200")
     
-    logLines.size should be(6)
-    logLines contains "INFO - User id=23 successful login"
+    logLines.length should be (3)
+    logLines contains "64.242.88.10"
   }
   
-  sparkTest("count all distinct info lines") {
-    val numLines = LogAnalyzer.countAllDistinctInfoLines(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+  sparkTest("count all distinct ip addresses for status code") {
+    val numLines = LogAnalyzer.countAllDistinctIpAddressesForStatusCode(
+      openAccessLog(ACCESS_LOG_1), openAccessLog(ACCESS_LOG_2), "200")
 
-    numLines should be (7)
+    numLines should be (5)
   }
 
-  sparkTest("find num words occurring in both files") {
-    val num = LogAnalyzer.findNumWordsOccurringInBothFiles(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+  sparkTest("find num ip addresses occurring in both logs") {
+    val num = LogAnalyzer.findNumIpAddressesOccurringInBothLogs(openAccessLog(ACCESS_LOG_1), openAccessLog(ACCESS_LOG_2))
 
-    num should be (10)
+    num should be (1)
   }
 
-  sparkTest("find num words occurring more than once") {
-    val num = LogAnalyzer.findNumWordsOccurringMoreThanOnce(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
+  sparkTest("find num ip addresses occurring more than once") {
+    val num = LogAnalyzer.findNumIpAddressesOccurringMoreThanOnce(openAccessLog(ACCESS_LOG_1), openAccessLog(ACCESS_LOG_2))
 
-    num should be (16)
+    num should be (3)
   }
 
-  sparkTest("find three most frequent words") {
-    val words = LogAnalyzer.findThreeMostFrequentWords(openAppLog(APP_LOG_1))
+  sparkTest("find three most frequent ip addresses") {
+    val ips = LogAnalyzer.findThreeMostFrequentIpAddresses(openAccessLog(ACCESS_LOG_1))
 
-    words should contain ("-")
-    words should contain ("INFO")
-    words should contain ("User")
+    ips.length should be (3)
+    ips should contain ("64.242.88.10")
+    ips should contain ("64.242.88.11")
+    ips should contain ("64.242.88.12")
   }
 
-  sparkTest("find first line of longest exception") {
-    val line = LogAnalyzer.findFirstLineOfLongestException(openAppLog(APP_LOG_1), openAppLog(APP_LOG_2))
-    
-    line should be ("ERROR - java.sql.SQLException: Io exception: The Network Adapter could not establish the connection")
-  }
+  def openAccessLog(path: String): RDD[AccessLogRecord] = {
+    val parser: AccessLogParser = new AccessLogParser()
+    sc.textFile(path).map( line => {
 
-  def openAppLog(path: String): RDD[String] = {
-    sc.textFile(path)
+      parser.parseRecordReturningNullObjectOnFailure(line)
+    })
   }
 }
