@@ -23,6 +23,7 @@ object AccessLogGenerator extends App {
     .toSeq.filter(s => !s.startsWith("#") && s.trim.nonEmpty)
   val methods = Seq("GET", "POST", "PUT")
   val paths = Seq("/index.html", "/api/users", "/api/posts")
+  val statusCodes = Seq("200", "404", "302")
 
   var run = true
   println(s"Generation logs to: $outputFile ")
@@ -42,7 +43,7 @@ object AccessLogGenerator extends App {
   def createResponse():LogEntry = {
     val path: String = randomInSeq(paths)
     val method = if (path == paths.head) methods.head else randomInSeq(methods)
-    LogEntry(randomInSeq(ipAddresses), method, 200, path, rand.nextInt(12000))
+    LogEntry(randomInSeq(ipAddresses), method, randomInSeq(statusCodes).toInt, path, rand.nextInt(12000))
   }
 
 }
