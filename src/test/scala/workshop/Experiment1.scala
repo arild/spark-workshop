@@ -3,10 +3,9 @@ package workshop
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SQLContext, DataFrame}
 import org.scalatest.Matchers
-import workshop.part1.TestTask
-import workshop.part2.{LogAnalyzerSql2, LogAnalyzerSql}
+import workshop.part2.LogAnalyzerSql2
 import workshop.util.SparkTestUtils
-import workshop.util.parser.{HttpStatusCode, AccessLogParser, AccessLogRecord}
+import workshop.util.parser.{HttpStatusCode, AccessLogParser}
 
 class Experiment1 extends SparkTestUtils with Matchers {
 
