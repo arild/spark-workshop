@@ -71,7 +71,7 @@ class AccessLogParser extends Serializable {
             matcher.group(3),
             matcher.group(4),
             matcher.group(5),
-            matcher.group(6),
+            matcher.group(6).toInt,
             matcher.group(7))
 
     }
@@ -83,7 +83,7 @@ class AccessLogParser extends Serializable {
  */
 object AccessLogParser {
 
-    val nullObjectAccessLogRecord = AccessLogRecord("", "", "", "", "", "", "")
+    val nullObjectAccessLogRecord = AccessLogRecord("", "", "", "", "", 0, "")
     
     /**
      * @param request A String like "GET /the-uri-here HTTP/1.1"
@@ -91,7 +91,7 @@ object AccessLogParser {
      * 
      * Returns a Tuple3 of three blank strings if the method fails.
      */
-    def parseRequestField(request: String): Option[Tuple3[String, String, String]] = {
+    def parseRequestField(request: String): Option[(String, String, String)] = {
         val arr = request.split(" ")
         if (arr.size == 3) Some((arr(0), arr(1), arr(2))) else None
     }

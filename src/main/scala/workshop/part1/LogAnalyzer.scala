@@ -6,18 +6,18 @@ import workshop.util.parser.AccessLogRecord
 
 object LogAnalyzer {
 
-  def countNumberOfStatusCode(log: RDD[AccessLogRecord], statusCode: String): Long = {
+  def countNumberOfStatusCode(log: RDD[AccessLogRecord], statusCode: Int): Long = {
     log.filter(_.status == statusCode).count()
   }
 
-  def collectDistinctIpAddressesForStatusCode(log: RDD[AccessLogRecord], statusCode: String): Array[String] = {
+  def collectDistinctIpAddressesForStatusCode(log: RDD[AccessLogRecord], statusCode: Int): Array[String] = {
     log.filter(_.status == statusCode)
       .map(_.ipAddress)
       .distinct()
       .collect()
   }
 
-  def countAllDistinctIpAddressesForStatusCode(log1: RDD[AccessLogRecord], log2: RDD[AccessLogRecord], statusCode: String): Long = {
+  def countAllDistinctIpAddressesForStatusCode(log1: RDD[AccessLogRecord], log2: RDD[AccessLogRecord], statusCode: Int): Long = {
     log1.union(log2)
       .filter(_.status == statusCode)
       .map(_.ipAddress)
