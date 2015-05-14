@@ -8,7 +8,8 @@ import workshop.util.IpLookup
 object TestTask {
 
   def countNumberOfErrors(file: RDD[String]): Map[String, Int] = {
-    file.map(x => parseFromLogLine(x)).map(x => (x, IpLookup.getCountryForIp(x)))
+    file.map(x => parseIpFromLogline(x))
+      .map(x => (x, IpLookup.getCountryForIp(x)))
       .map(x => x._2)
       .flatMap(x => x)
       .map(x => (x, 1))
@@ -21,7 +22,7 @@ object TestTask {
 
   private val pattern = Pattern.compile(patternStrng)
 
-  def parseFromLogLine(logline: String): String = {
+  def parseIpFromLogline(logline: String): String = {
     val m: Matcher = pattern.matcher(logline)
 
     if (!m.find()) {
