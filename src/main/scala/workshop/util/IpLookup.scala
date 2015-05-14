@@ -15,7 +15,7 @@ object IpLookup extends App {
 
   def getCountryForIp(ip: String): Option[String] = {
     val inetAddress: Option[InetAddress] = getInetAddress(ip)
-    inetAddress.flatMap(lookupCountry2).map(x => x.getCountry.getName)
+    inetAddress.flatMap(lookupCountry).map(x => x.getCountry.getName)
   }
 
   private def createDb: DatabaseReader = {
@@ -24,7 +24,7 @@ object IpLookup extends App {
     geoip
   }
 
-  private lazy val lookupCountry2: (InetAddress => Option[CountryResponse]) = { ip =>
+  private def lookupCountry: (InetAddress => Option[CountryResponse]) = { ip =>
     Try{ geoip.country(ip) }.toOption
   }
 
@@ -37,7 +37,6 @@ object IpLookup extends App {
     try {
       address match {
         case validIP(_, _, _, _) => Some(InetAddress.getByAddress(address.split('.').map(_.toInt.toByte)))
-//        case _                   => Some(InetAddress.getByName(address))
         case _ => None
       }
     } catch { // if all fails...
