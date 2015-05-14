@@ -14,6 +14,8 @@ libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.3" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.10"
 
+libraryDependencies += "com.maxmind.geoip2" % "geoip2" % "2.2.0"
+
 //parallelExecution in Test := false
 
 fork in Test := true
