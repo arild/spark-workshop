@@ -16,6 +16,10 @@ libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.10"
 
 libraryDependencies += "com.maxmind.geoip2" % "geoip2" % "2.2.0"
 
+libraryDependencies += "joda-time" % "joda-time" % "2.7"
+
+libraryDependencies += "org.joda" % "joda-convert" % "1.7"
+
 //parallelExecution in Test := false
 
 fork in Test := true
