@@ -9,7 +9,7 @@ case class AccessLogRecord (
     remoteUser: String,              // typically `-`
     dateTime: String,                // [day/month/year:hour:minute:second zone]
     request: String,                 // `GET /foo ...`
-    status: String,          // 200, 404, etc.
+    status: Int,                     // 200, 404, etc.
     bytesSent: String                // may be `-`
 )
 

@@ -1,6 +1,7 @@
 package workshop
 
-import java.io.FileWriter
+import java.io.OutputStream
+import java.net.{SocketException, ServerSocket, Socket}
 
 import org.joda.time.DateTime
 
@@ -25,21 +26,31 @@ object AccessLogGenerator extends App {
   val paths = Seq("/index.html", "/api/users", "/api/posts")
 
   var run = true
-  println(s"Generation logs to: $outputFile ")
 
+  val serverSocket: ServerSocket = new ServerSocket(1337)
+  var accept: Socket = serverSocket.accept()
+  println("Connected to " + accept.getInetAddress)
+  val os: OutputStream = accept.getOutputStream
   while (run) {
     val res = createResponse()
-    val logFile = new FileWriter(outputFile, true)
-    logFile.append( res.toString + "\n")
-    logFile.close()
-    Thread.sleep(rand.nextInt(1000))
+    val logEntry = res.toString + "\n"
+    try {
+      os.write(logEntry.getBytes("UTF-8"))
+    } catch {
+      case se: SocketException => {
+        println("Waiting for new connection: " + se.getMessage)
+        accept = serverSocket.accept()
+        println("Connected to " + accept.getInetAddress)
+      }
+    }
+    Thread.sleep(rand.nextInt(100))
   }
 
   def randomInSeq[T](elements:Seq[T]): T = {
     elements(rand.nextInt(elements.length))
   }
 
-  def getStatusCode(): Int = {
+  def createStatusCode(): Int = {
     rand.nextInt(100) match {
       case r if 0 until 70 contains r => 200
       case r if 70 until 80 contains r => 302
@@ -52,7 +63,7 @@ object AccessLogGenerator extends App {
     val path: String = randomInSeq(paths)
     val method = if (path == paths.head) methods.head else randomInSeq(methods)
 
-    LogEntry(randomInSeq(ipAddresses), method, getStatusCode(), path, rand.nextInt(12000))
+    LogEntry(randomInSeq(ipAddresses), method, createStatusCode(), path, rand.nextInt(12000))
   }
 
 }
