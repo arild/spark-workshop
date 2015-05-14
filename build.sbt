@@ -14,6 +14,10 @@ libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.3" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.10"
 
+libraryDependencies += "joda-time" % "joda-time" % "2.7"
+
+libraryDependencies += "org.joda" % "joda-convert" % "1.7"
+
 //parallelExecution in Test := false
 
 fork in Test := true
