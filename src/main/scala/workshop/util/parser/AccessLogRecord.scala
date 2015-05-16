@@ -10,7 +10,7 @@ case class AccessLogRecord (
     dateTime: String,                // [day/month/year:hour:minute:second zone]
     request: String,                 // `GET /foo ...`
     status: Int,                     // 200, 404, etc.
-    bytesSent: String                // may be `-`
+    bytesSent: Int                // may be `-`
 )
 
 

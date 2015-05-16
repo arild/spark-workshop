@@ -1,10 +1,10 @@
 package workshop.part2
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{SQLContext, DataFrame}
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest._
 import workshop.util.SparkTestUtils
-import workshop.util.parser.{HttpStatusCode, AccessLogParser}
+import workshop.util.parser.{AccessLogParser, HttpStatusCode}
 
 class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
 
@@ -20,12 +20,10 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
-    val parser: AccessLogParser = new AccessLogParser()
-
     openHttpStatusFile(sqlContext)
 
     val df = rdd
-      .map(line => parser.parseRecordReturningNullObjectOnFailure(line))
+      .map(AccessLogParser.parseRecord)
       .toDF()
     df.registerTempTable("logs")
     df

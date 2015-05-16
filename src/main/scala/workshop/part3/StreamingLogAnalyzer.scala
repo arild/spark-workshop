@@ -3,7 +3,7 @@ package workshop.part3
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.streaming.{StreamingContext, Seconds}
+import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 import workshop.util.parser.AccessLogParser
 
@@ -16,9 +16,7 @@ object StreamingLogAnalyzer extends App {
 
   val stream = ssc.socketTextStream("localhost", 1337, StorageLevel.MEMORY_AND_DISK)
 
-  val parser: AccessLogParser = new AccessLogParser()
-  val logEntries = stream.map(parser.parseRecordReturningNullObjectOnFailure)
-
+  val logEntries = stream.map(AccessLogParser.parseRecord)
 
   val window = logEntries.window(Seconds(10), Seconds(10))
   window.foreachRDD(lr => {

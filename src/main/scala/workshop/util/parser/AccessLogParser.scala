@@ -19,62 +19,6 @@ import scala.util.control.Exception._
 @SerialVersionUID(100L)
 class AccessLogParser extends Serializable {
 
-    private val ddd = "\\d{1,3}"                      // at least 1 but not more than 3 times (possessive)
-    private val ip = s"($ddd\\.$ddd\\.$ddd\\.$ddd)?"  // like `123.456.7.89`
-    private val client = "(\\S+)"                     // '\S' is 'non-whitespace character'
-    private val user = "(\\S+)"
-    private val dateTime = "(\\[.+?\\])"              // like `[21/Jul/2009:02:48:13 -0700]`
-    private val request = "\"(.*?)\""                 // any number of any character, reluctant
-    private val status = "(\\d{3})"
-    private val bytes = "(\\S+)"                      // this can be a "-"
-    private val referer = "\"(.*?)\""
-    private val agent = "\"(.*?)\""
-    private val regex = s"$ip $client $user $dateTime $request $status $bytes"
-    private val p = Pattern.compile(regex)
-    
-    /**
-     * note: group(0) is the entire record that was matched (skip it)
-     * @param record Assumed to be an Apache access log combined record.
-     * @return An AccessLogRecord instance wrapped in an Option.
-     */
-    def parseRecord(record: String): Option[AccessLogRecord] = {
-        val matcher = p.matcher(record)
-        if (matcher.find) {
-            Some(buildAccessLogRecord(matcher))
-        } else {
-            None
-        }
-    }
-
-    /**
-     * Same as parseRecord, but returns a "Null Object" version of an AccessLogRecord
-     * rather than an Option.
-     * 
-     * @param record Assumed to be an Apache access log combined record.
-     * @return An AccessLogRecord instance. This will be a "Null Object" version of an
-     * AccessLogRecord if the parsing process fails. All fields in the Null Object
-     * will be empty strings.
-     */
-    def parseRecordReturningNullObjectOnFailure(record: String): AccessLogRecord = {
-        val matcher = p.matcher(record)
-        if (matcher.find) {
-            buildAccessLogRecord(matcher)
-        } else {
-            AccessLogParser.nullObjectAccessLogRecord
-        }
-    }
-    
-    private def buildAccessLogRecord(matcher: Matcher) = {
-        AccessLogRecord(
-            matcher.group(1),
-            matcher.group(2),
-            matcher.group(3),
-            matcher.group(4),
-            matcher.group(5),
-            matcher.group(6).toInt,
-            matcher.group(7))
-
-    }
 }
 
 /**
@@ -83,8 +27,52 @@ class AccessLogParser extends Serializable {
  */
 object AccessLogParser {
 
-    val nullObjectAccessLogRecord = AccessLogRecord("", "", "", "", "", 0, "")
-    
+  val nullObjectAccessLogRecord = AccessLogRecord("", "", "", "", "", 0, 0)
+
+  private val ddd = "\\d{1,3}"                      // at least 1 but not more than 3 times (possessive)
+  private val ip = s"($ddd\\.$ddd\\.$ddd\\.$ddd)?"  // like `123.456.7.89`
+  private val client = "(\\S+)"                     // '\S' is 'non-whitespace character'
+  private val user = "(\\S+)"
+  private val dateTime = "(\\[.+?\\])"              // like `[21/Jul/2009:02:48:13 -0700]`
+  private val request = "\"(.*?)\""                 // any number of any character, reluctant
+  private val status = "(\\d{3})"
+  private val bytes = "(\\S+)"                      // this can be a "-"
+  private val referer = "\"(.*?)\""
+  private val agent = "\"(.*?)\""
+  private val regex = s"$ip $client $user $dateTime $request $status $bytes"
+  private val p = Pattern.compile(regex)
+
+
+  /**
+   * Same as parseRecord, but returns a "Null Object" version of an AccessLogRecord
+   * rather than an Option.
+   *
+   * @param record Assumed to be an Apache access log combined record.
+   * @return An AccessLogRecord instance. This will be a "Null Object" version of an
+   * AccessLogRecord if the parsing process fails. All fields in the Null Object
+   * will be empty strings.
+   */
+  def parseRecord(record: String): AccessLogRecord = {
+    val matcher = p.matcher(record)
+    if (matcher.find) {
+      buildAccessLogRecord(matcher)
+    } else {
+      AccessLogParser.nullObjectAccessLogRecord
+    }
+  }
+
+  private def buildAccessLogRecord(matcher: Matcher) = {
+    AccessLogRecord(
+      matcher.group(1),
+      matcher.group(2),
+      matcher.group(3),
+      matcher.group(4),
+      matcher.group(5),
+      matcher.group(6).toInt,
+      matcher.group(7).toInt)
+
+  }
+
     /**
      * @param request A String like "GET /the-uri-here HTTP/1.1"
      * @return A Tuple3(requestType, uri, httpVersion). requestType is GET, POST, etc.

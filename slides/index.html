@@ -125,10 +125,10 @@ URL: https://code.google.com/p/io-2012-slides
         <article class="large">
             
             <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
-val lines: RDD[String] = sc.textFile("application.log")
 
-val result: Array[String] = lines
-  .filter(line => line.startsWith("INFO")) // Transformation (returns new RDD)
+val result: Array[AccessLogRecord] = sc.textFile("src/test/resources/access_log-1")
+  .map(AccessLogParser.parseRecord) // // Transformation (returns new RDD)
+  .filter(record => record.bytesSent > 1024) // Transformation (returns new RDD)
   .collect() // Action (compute result)</pre>
         </article>
     </slide>
@@ -139,11 +139,14 @@ val result: Array[String] = lines
         </hgroup>
         <article class="large">
             <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
-val lines1: RDD[String] = sc.textFile("src/test/resources/application-1.log")
-val lines2: RDD[String] = sc.textFile("src/test/resources/application-2.log")
 
-lines1.intersection(lines2)
-  .foreach(line => {
+val log1: RDD[AccessLogRecord] = sc.textFile("access_log-1")
+  .map(AccessLogParser.parseRecord)
+val log2: RDD[AccessLogRecord] = sc.textFile("access_log-2")
+  .map(AccessLogParser.parseRecord)
+
+log1.intersection(log2) // Transformation (returns new RDD)
+  .foreach(record => {
     // Write to external storage e.g.
   })</pre>
         </article>
@@ -155,12 +158,10 @@ lines1.intersection(lines2)
         </hgroup>
         <article class="large">
             <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
-val lines: RDD[String] = sc.textFile("src/test/resources/application.log")
 
-val words: Array[(String, Int)] = lines
-  .flatMap(line => line.split(" "))
-  .filter(!_.isEmpty)
-  .map(word => (word, 1))
+val statusCodes: Array[(Int, Int)] = sc.textFile("access_log-1")
+  .map(AccessLogParser.parseRecord(_).status)
+  .map(status => (status, 1))
   .reduceByKey((a, b) => a + b)
   .take(10)</pre>
         </article>

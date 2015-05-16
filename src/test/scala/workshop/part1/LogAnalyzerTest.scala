@@ -2,8 +2,8 @@ package workshop.part1
 
 import org.apache.spark.rdd.RDD
 import org.scalatest._
-import workshop.util.parser.{AccessLogParser, AccessLogRecord}
 import workshop.util.SparkTestUtils
+import workshop.util.parser.{AccessLogParser, AccessLogRecord}
 
 class LogAnalyzerTest extends SparkTestUtils with Matchers {
 
@@ -51,9 +51,6 @@ class LogAnalyzerTest extends SparkTestUtils with Matchers {
   }
 
   def openAccessLog(path: String): RDD[AccessLogRecord] = {
-    val parser: AccessLogParser = new AccessLogParser()
-    sc.textFile(path).map( line => {
-      parser.parseRecordReturningNullObjectOnFailure(line)
-    })
+    sc.textFile(path).map(AccessLogParser.parseRecord)
   }
 }
