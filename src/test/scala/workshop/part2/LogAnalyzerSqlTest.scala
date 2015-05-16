@@ -8,21 +8,30 @@ import workshop.util.parser.{AccessLogParser, HttpStatusCode}
 
 class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
 
-  sparkTest("count stuff") {
-    val file: RDD[String] = sc.textFile("access_log")
-    val dataFrame: DataFrame = openLogFile(file)
-    LogAnalyzerSql.countStatus200Loglines(dataFrame) shouldBe 1274
-    println(LogAnalyzerSql.countLoglinesByStatuscodes(dataFrame))
+  val ACCESS_LOG_1 = "src/test/resources/access_log-1"
+
+  sparkTest("count status 200 log lines") {
+    val dataFrame: DataFrame = openLogFile()
+    LogAnalyzerSql.countStatus200Loglines(dataFrame) shouldBe 6
+  }
+
+  sparkTest("sum bytes per request") {
+    val dataFrame: DataFrame = openLogFile()
     println(LogAnalyzerSql.sumBytesPerRequest(dataFrame))
   }
 
-  def openLogFile(rdd: RDD[String]): DataFrame = {
+//  sparkTest("count stuff") {
+//    val dataFrame: DataFrame = openLogFile()
+//    println(LogAnalyzerSql.countLoglinesByStatuscodes(dataFrame))
+//  }
+
+  def openLogFile(): DataFrame = {
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
     openHttpStatusFile(sqlContext)
 
-    val df = rdd
+    val df = sc.textFile(ACCESS_LOG_1)
       .map(AccessLogParser.parseRecord)
       .toDF()
     df.registerTempTable("logs")
