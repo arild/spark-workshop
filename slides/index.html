@@ -69,26 +69,13 @@ URL: https://code.google.com/p/io-2012-slides
             </ul>
         </article>
     </slide>
-    
-    <slide>
-        <hgroup>
-            <h2>Outline</h2>
-        </hgroup>
-        <article class="large">
-            <ul>
-                <li>Part 1 - Spark Core</li>
-                <li>Part 2 - Spark SQL</li>
-                <li>Part 3 - Spark Streaming</li>
-            </ul>
-        </article>
-    </slide>
 
     <slide>
         <hgroup>
-            <h2>Motivation</h2>
+            <h2>What is Spark?</h2>
         </hgroup>
         <article class="large">
-            Spark + Scala = Best!
+            <img height="500px" src="figures/spark-architecture.png"/>
         </article>
     </slide>
 
@@ -115,7 +102,8 @@ URL: https://code.google.com/p/io-2012-slides
                 <li>Spark automatically distributes data and parallelizes operations on RDDs</li>
                 <li>Transformations vs. actions</li>
             </ul>
-        </article>
+            <img width="700px" src="figures/transformation-vs-action.png" />
+            </article>
     </slide>
 
     <slide>
@@ -126,8 +114,10 @@ URL: https://code.google.com/p/io-2012-slides
             
             <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
 
-val result: Array[AccessLogRecord] = sc.textFile("src/test/resources/access_log-1")
-  .map(AccessLogParser.parseRecord) // // Transformation (returns new RDD)
+val log: RDD[AccessLogRecord] = sc.textFile("access_log-1")
+  .map(AccessLogParser.parseRecord) // Transformation (returns new RDD)
+
+val result: Array[AccessLogRecord] = log
   .filter(record => record.bytesSent > 1024) // Transformation (returns new RDD)
   .collect() // Action (compute result)</pre>
         </article>
