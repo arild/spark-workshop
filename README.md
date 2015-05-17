@@ -1,4 +1,4 @@
-Apache Spark workshop
+Apache Spark introduction workshop
 
-Workshop gir introduksjon til Apache Spark med oppgaver, og noen slides. Spark Core, Spark SQL, og Spark Streaming dekkes i workshopen.
+Hands-on workshop were we will process access logs with Spark Core, Spark SQL, and Spark Streaming.
 
