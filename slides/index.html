@@ -213,6 +213,59 @@ val statusCodes: Array[(Int, Int)] = sc.textFile("access_log-1")
 
     <slide>
         <hgroup>
+            <h2>Creating DataFrame with schema</h2>
+        </hgroup>
+        <article class="large">
+                        <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
+val sqlContext = new SQLContext(sc)
+
+// Used to implicitly convert an RDD to a DataFrame
+import sqlContext.implicits._
+
+val df: DataFrame = sc.textFile("src/test/resources/access_log-1")
+  .map(AccessLogParser.parseRecord)
+  .toDF()
+df.printSchema()</pre>
+        </article>
+        <article class="smaller"><pre class="prettyprint">root
+ |-- ipAddress: string (nullable = true)
+ |-- rfc1413ClientIdentity: string (nullable = true)
+ |-- remoteUser: string (nullable = true)
+ |-- dateTime: string (nullable = true)
+ |-- request: string (nullable = true)
+ |-- status: integer (nullable = false)
+ |-- bytesSent: integer (nullable = false)
+</pre>
+        </article>
+    </slide>
+
+    <slide>
+        <hgroup>
+            <h2>Writing SQL</h2>
+        </hgroup>
+        <article class="large">
+                        <pre class="prettyprint">val sc = new SparkContext("local[4]", "AppName")
+val sqlContext = new SQLContext(sc)
+
+import sqlContext.implicits._ // implicitly convert an RDD to a DataFrame
+
+val df: DataFrame = sc.textFile("src/test/resources/access_log-1")
+  .map(AccessLogParser.parseRecord).toDF()
+
+df.registerTempTable("logs")
+
+val res: Array[Row] = df.sqlContext.sql(
+  """SELECT ipAddress
+     FROM logs
+     WHERE bytesSent > 1024
+  """).collect()
+
+res.foreach(row => println(row.getString(0)))</pre>
+        </article>
+    </slide>
+
+    <slide>
+        <hgroup>
             <h2>Part 2 - Exercises</h2>
         </hgroup>
         <article class="large">
