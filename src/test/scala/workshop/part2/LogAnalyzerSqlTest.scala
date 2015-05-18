@@ -15,9 +15,18 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     LogAnalyzerSql.countStatus200Loglines(dataFrame) shouldBe 6
   }
 
+  sparkTest("find three most frequent ip addresses") {
+    val dataFrame: DataFrame = openLogFile()
+    val ips = LogAnalyzerSql.findThreeMostFrequentIpAddresses(dataFrame)
+
+    ips.length shouldBe 3
+    ips should contain ("77.241.224.111")
+    ips should contain ("2.148.3.1")
+  }
+
   sparkTest("sum bytes per request") {
     val dataFrame: DataFrame = openLogFile()
-    println(LogAnalyzerSql.sumBytesPerRequest(dataFrame))
+    //println(LogAnalyzerSql.sumBytesPerRequest(dataFrame))
   }
 
 //  sparkTest("count stuff") {

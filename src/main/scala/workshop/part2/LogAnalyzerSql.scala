@@ -12,6 +12,17 @@ object LogAnalyzerSql {
     res.head.getLong(0)
   }
 
+  def findThreeMostFrequentIpAddresses(df: DataFrame): Array[String] = {
+    df.sqlContext.sql(
+      """SELECT ipAddress, count(ipAddress) numIpAddresses
+         FROM logs
+         GROUP BY ipAddress
+         ORDER BY numIpAddresses desc
+      """.stripMargin)
+      .take(3)
+      .map(row => row.getString(0))
+  }
+
   def sumBytesPerRequest(df: DataFrame): Map[String, Double] = {
     df.sqlContext.sql(
       """SELECT request, avg(bytesSent), sum(bytesSent) sum_bytes
