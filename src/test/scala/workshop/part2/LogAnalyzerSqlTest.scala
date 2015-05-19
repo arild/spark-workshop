@@ -24,15 +24,13 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     ips should contain ("2.148.3.1")
   }
 
-  sparkTest("sum bytes per request") {
+  sparkTest("find request with largest average response size") {
     val dataFrame: DataFrame = openLogFile()
-    //println(LogAnalyzerSql.sumBytesPerRequest(dataFrame))
-  }
+    val (request, avgResponseSize) = LogAnalyzerSql.findRequestWithLargestAverageResponseSize(dataFrame)
 
-//  sparkTest("count stuff") {
-//    val dataFrame: DataFrame = openLogFile()
-//    println(LogAnalyzerSql.countLoglinesByStatuscodes(dataFrame))
-//  }
+    request shouldBe "PUT /api/users HTTP/1.1"
+    avgResponseSize shouldBe 9658.0
+  }
 
   def openLogFile(): DataFrame = {
     val sqlContext = new SQLContext(sc)

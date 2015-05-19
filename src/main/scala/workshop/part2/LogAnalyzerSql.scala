@@ -18,23 +18,20 @@ object LogAnalyzerSql {
          FROM logs
          GROUP BY ipAddress
          ORDER BY numIpAddresses desc
-      """.stripMargin)
+      """.stripMargin).collect()
       .take(3)
       .map(row => row.getString(0))
   }
 
-  def sumBytesPerRequest(df: DataFrame): Map[String, Double] = {
-    df.sqlContext.sql(
-      """SELECT request, avg(bytesSent), sum(bytesSent) sum_bytes
+  def findRequestWithLargestAverageResponseSize(df: DataFrame): (String, Double) = {
+    val res = df.sqlContext.sql(
+      """SELECT request, avg(bytesSent) avg_bytes
          FROM logs
          GROUP BY request
-         ORDER BY sum_bytes desc
+         ORDER BY avg_bytes desc
       """.stripMargin)
-      .take(10)
-      .foreach(println)
-    df.show()
 
-    Map.empty
+    (res.head.getString(0), res.head.getDouble(1))
   }
 
   def countLoglinesByStatuscodes(df: DataFrame): List[(Int, String, Long)] = {
