@@ -29,9 +29,20 @@ object LogAnalyzerSql {
          FROM logs
          GROUP BY request
          ORDER BY avg_bytes desc
-      """.stripMargin)
+      """)
 
     (res.head.getString(0), res.head.getDouble(1))
+  }
+
+  def findDescriptionForAllUniqueStatusCodes(df: DataFrame): Map[Int, String] = {
+    df.sqlContext.sql(
+      """SELECT DISTINCT l.status, s.description
+         FROM logs l
+         JOIN http_status s ON s.status = l.status
+      """)
+      .collect()
+      .map(row => (row.getInt(0), row.getString(1)))
+      .toMap
   }
 
   def countLoglinesByStatuscodes(df: DataFrame): List[(Int, String, Long)] = {
