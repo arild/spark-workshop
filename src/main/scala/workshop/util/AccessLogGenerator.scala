@@ -1,7 +1,7 @@
-package workshop
+package workshop.util
 
 import java.io.OutputStream
-import java.net.{SocketException, ServerSocket, Socket}
+import java.net.{ServerSocket, Socket, SocketException}
 
 import org.joda.time.DateTime
 
