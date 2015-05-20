@@ -14,19 +14,8 @@ object StreamingLogAnalyzer extends App {
 
   ssc.socketTextStream("localhost", 8000, StorageLevel.MEMORY_AND_DISK)
     .map(AccessLogParser.parseRecord)
-    .window(Seconds(60), Seconds(5))
-    .foreachRDD(lr => {
-      if (lr.count() == 0) {
-        println("No data")
-      } else {
-        val http200 = lr.filter(_.status == 200).count()
-        val http500 = lr.filter(_.status == 500).count()
-        val http404 = lr.filter(_.status == 404).count()
+    // TODO: do something cool!
 
-        println(s"Data: ${lr.count()}\n200: $http200\n404: $http404\n500: $http500")
-        println("---------------")
-    }
-  })
   Logger.getRootLogger.setLevel(Level.WARN)
   ssc.start()
   ssc.awaitTermination()
