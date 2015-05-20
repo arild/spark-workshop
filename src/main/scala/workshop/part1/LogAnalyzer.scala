@@ -40,8 +40,8 @@ object LogAnalyzer {
       .count()
   }
 
-  def findThreeMostFrequentIpAddresses(log: RDD[AccessLogRecord]): Array[String] = {
-    log.map(_.ipAddress)
+  def findThreeMostFrequentIpAddresses(log1: RDD[AccessLogRecord]): Array[String] = {
+    log1.map(_.ipAddress)
       .map(ip => (ip, 1))
       .reduceByKey(_ + _)
       .map { tuple => tuple.swap }

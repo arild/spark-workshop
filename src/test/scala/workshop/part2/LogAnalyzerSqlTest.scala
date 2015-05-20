@@ -6,9 +6,6 @@ import workshop.util.SparkTestUtils
 
 class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
 
-  def tables(): DataFrame = {
-    LogAnalyzerSql.createTables(sc, "src/test/resources/access_log-1", "src/test/resources/http_status_codes.csv")
-  }
 
   sparkTest("creates two tables") {
     val numTables = tables().sqlContext.sql("SHOW TABLES").collect().length
@@ -25,6 +22,7 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     ips.length shouldBe 3
     ips should contain ("77.241.224.111")
     ips should contain ("2.148.3.1")
+    ips should contain ("2.148.3.42")
   }
 
   sparkTest("find request with largest average response size") {
@@ -40,5 +38,9 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     res.get(200) shouldBe Some("OK")
     res.get(302) shouldBe Some("Found")
     res.get(404) shouldBe Some("Not Found")
+  }
+
+  def tables(): DataFrame = {
+    LogAnalyzerSql.createTables(sc, "src/test/resources/access_log-1", "src/test/resources/http_status_codes.csv")
   }
 }
