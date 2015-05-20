@@ -1,8 +1,28 @@
 package workshop.part2
 
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import workshop.util.parser.{AccessLogParser, HttpStatusParser}
 
 object LogAnalyzerSql {
+
+  def createTables(sc: SparkContext, accessLog: String, httpStatus: String): DataFrame = {
+    val sqlContext = new SQLContext(sc)
+    import sqlContext.implicits._
+
+    sc.textFile(accessLog)
+      .map(AccessLogParser.parseRecord)
+      .toDF()
+      .registerTempTable("logs")
+
+    sc.textFile(httpStatus)
+      .map(HttpStatusParser.parseRecord)
+      .toDF()
+      .registerTempTable("http_status")
+
+    sqlContext.tables()
+  }
+
   def countStatus200Loglines(df: DataFrame): Long = {
     val res: Array[Row] = df.sqlContext.sql(
       """SELECT count(*) AS antall
@@ -43,17 +63,5 @@ object LogAnalyzerSql {
       .collect()
       .map(row => (row.getInt(0), row.getString(1)))
       .toMap
-  }
-
-  def countLoglinesByStatuscodes(df: DataFrame): List[(Int, String, Long)] = {
-    val res: Array[Row] = df.sqlContext.sql(
-      """SELECT l.status, s.description, count(*) AS antall
-         FROM logs l
-         JOIN http_status s ON s.status = l.status
-         GROUP BY l.status, s.description
-    """).collect()
-    res
-      .map(x => (x.getString(0).toInt, x.getString(1), x.getLong(2)))
-      .toList
   }
 }
