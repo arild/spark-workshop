@@ -10,24 +10,21 @@ import workshop.util.parser.AccessLogParser
 object StreamingLogAnalyzer extends App {
 
   val conf = new SparkConf().setAppName("Streaming log analyzer").setMaster("local[2]")
-  val sc = new SparkContext(conf)
+  val ssc = new StreamingContext(new SparkContext(conf), Seconds(5))
 
-  val ssc = new StreamingContext(sc, Seconds(10))
+  ssc.socketTextStream("localhost", 8000, StorageLevel.MEMORY_AND_DISK)
+    .map(AccessLogParser.parseRecord)
+    .window(Seconds(60), Seconds(5))
+    .foreachRDD(lr => {
+      if (lr.count() == 0) {
+        println("No data")
+      } else {
+        val http200 = lr.filter(_.status == 200).count()
+        val http500 = lr.filter(_.status == 500).count()
+        val http404 = lr.filter(_.status == 404).count()
 
-  val stream = ssc.socketTextStream("localhost", 1337, StorageLevel.MEMORY_AND_DISK)
-
-  val logEntries = stream.map(AccessLogParser.parseRecord)
-
-  val window = logEntries.window(Seconds(10), Seconds(10))
-  window.foreachRDD(lr => {
-    if (lr.count() == 0) {
-      println("No data")
-    } else {
-      val http200 = lr.filter(_.status == 200).count()
-      val http500 = lr.filter(_.status == 500).count()
-      val http404 = lr.filter(_.status == 404).count()
-
-      println(s"Data: ${lr.count()}\n200: $http200\n404: $http404\n500: $http500")
+        println(s"Data: ${lr.count()}\n200: $http200\n404: $http404\n500: $http500")
+        println("---------------")
     }
   })
   Logger.getRootLogger.setLevel(Level.WARN)
