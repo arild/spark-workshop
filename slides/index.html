@@ -222,7 +222,7 @@ val sqlContext = new SQLContext(sc)
 // Used to implicitly convert an RDD to a DataFrame
 import sqlContext.implicits._
 
-val df: DataFrame = sc.textFile("src/test/resources/access_log-1")
+val df: DataFrame = sc.textFile("access_log-1")
   .map(AccessLogParser.parseRecord)
   .toDF()
 df.printSchema()</pre>
@@ -249,7 +249,7 @@ val sqlContext = new SQLContext(sc)
 
 import sqlContext.implicits._ // implicitly convert an RDD to a DataFrame
 
-val df: DataFrame = sc.textFile("src/test/resources/access_log-1")
+val df: DataFrame = sc.textFile("access_log-1")
   .map(AccessLogParser.parseRecord).toDF()
 
 df.registerTempTable("logs")
@@ -263,6 +263,34 @@ val res: Array[Row] = df.sqlContext.sql(
 res.foreach(row => println(row.getString(0)))</pre>
         </article>
     </slide>
+
+    <slide>
+        <hgroup>
+            <h2>Tables - "logs" and "http_status"</h2>
+        </hgroup>
+        <article class="large">
+                        <pre class="prettyprint">case class AccessLogRecord (
+    ipAddress: String,
+    rfc1413ClientIdentity: String,   // typically `-`
+    remoteUser: String,              // typically `-`
+    dateTime: String,                // [day/month/year:hour:minute:second zone]
+    request: String,                 // `GET /foo ...`
+    status: Int,                     // 200, 404, etc.
+    bytesSent: Int
+)
+</pre>
+        </article>
+        <article class="large">
+                        <pre class="prettyprint">case class HttpStatusCode(
+    status: Int,         // 200, 404, etc.
+    description: String, // "OK", "Not Found", etc.
+    status_type: String  // "Successful", "Client Error", etc.
+)
+
+</pre>
+        </article>
+    </slide>
+
 
     <slide>
         <hgroup>
