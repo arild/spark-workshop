@@ -1,10 +1,11 @@
-package workshop.util
+package workshop.part3
 
-import java.io.OutputStream
 import java.net.{ServerSocket, Socket, SocketException}
 
 import org.joda.time.DateTime
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
 import scala.io.Source
 import scala.util.Random
 
@@ -16,34 +17,35 @@ case class LogEntry(ip:String, method: String, responseCode: Int, path:String, l
 }
 
 object AccessLogGenerator extends App {
-
   val rand = new Random()
-
-  val outputFile: String = "target/access.log"
   val ipAddresses = Source.fromInputStream(getClass.getResourceAsStream("/ip_addresses.txt")).getLines()
     .toSeq.filter(s => !s.startsWith("#") && s.trim.nonEmpty)
   val methods = Seq("GET", "POST", "PUT")
   val paths = Seq("/index.html", "/api/users", "/api/posts")
 
-  var run = true
-
-  val serverSocket: ServerSocket = new ServerSocket(1337)
-  var accept: Socket = serverSocket.accept()
-  println("Connected to " + accept.getInetAddress)
-  val os: OutputStream = accept.getOutputStream
-  while (run) {
-    val res = createResponse()
-    val logEntry = res.toString + "\n"
-    try {
-      os.write(logEntry.getBytes("UTF-8"))
-    } catch {
-      case se: SocketException => {
-        println("Waiting for new connection: " + se.getMessage)
-        accept = serverSocket.accept()
-        println("Connected to " + accept.getInetAddress)
-      }
+  val serverSocket: ServerSocket = new ServerSocket(8000)
+  while (true) {
+    val socket: Socket = serverSocket.accept()
+    Future {
+      handleConnection(socket)
     }
-    Thread.sleep(rand.nextInt(100))
+  }
+
+  def handleConnection(socket: Socket) = {
+    println("Connected to " + socket.getInetAddress)
+    var running = true
+    while (running) {
+      val logEntry = createResponse().toString + "\n"
+      try {
+        socket.getOutputStream.write(logEntry.getBytes("UTF-8"))
+      } catch {
+        case se: SocketException => {
+          socket.close()
+          running = false
+        }
+      }
+      Thread.sleep(rand.nextInt(100))
+    }
   }
 
   def randomInSeq[T](elements:Seq[T]): T = {
@@ -65,6 +67,5 @@ object AccessLogGenerator extends App {
 
     LogEntry(randomInSeq(ipAddresses), method, createStatusCode(), path, rand.nextInt(12000))
   }
-
 }
 
