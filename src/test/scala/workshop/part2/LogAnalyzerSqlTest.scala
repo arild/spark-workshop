@@ -1,10 +1,9 @@
 package workshop.part2
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest._
 import workshop.util.SparkTestUtils
-import workshop.util.parser.{AccessLogParser, HttpStatusCode}
+import workshop.util.parser.{AccessLogParser, HttpStatusParser}
 
 class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
 
@@ -41,26 +40,16 @@ class LogAnalyzerSqlTest extends SparkTestUtils with Matchers {
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
-    openHttpStatusFile(sqlContext)
-
-    val df = sc.textFile(ACCESS_LOG_1)
+    sc.textFile(ACCESS_LOG_1)
       .map(AccessLogParser.parseRecord)
       .toDF()
-    df.registerTempTable("logs")
-    df
-  }
+      .registerTempTable("logs")
 
-  def openHttpStatusFile(sqlContext: SQLContext): Unit = {
-    import sqlContext.implicits._
-
-    val lines: RDD[Array[String]] = sc.textFile("src/test/resources/http_status_codes.csv")
-      .map(line => line.split(",").map(_.trim))
-
-    val header: Array[String] = lines.first()
-    val data: RDD[Array[String]] = lines.filter(_(0) != header(0))
-    data
-      .map(x => HttpStatusCode(x(0).toInt, x(1), x(2)))
+    sc.textFile("src/test/resources/http_status_codes.csv")
+      .map(HttpStatusParser.parseRecord)
       .toDF()
       .registerTempTable("http_status")
+
+    sqlContext.tables()
   }
 }
