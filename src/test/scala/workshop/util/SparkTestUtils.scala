@@ -29,6 +29,12 @@ class SparkTestUtils extends FunSuite {
       sc = new SparkContext("local[4]", name)
       try {
         body
+      } catch {
+        case e: NotImplementedError => {
+          e.setStackTrace(Array())
+          throw e
+        }
+        case e: Exception => throw e
       }
       finally {
         sc.stop()
