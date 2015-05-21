@@ -26,8 +26,8 @@ object LogAnalyzer {
   }
 
   def findNumIpAddressesOccurringInBothLogs(log1: RDD[AccessLogRecord], log2: RDD[AccessLogRecord]): Long = {
-    log1.map(_.status)
-      .intersection(log2.map(_.status))
+    log1.map(_.ipAddress)
+      .intersection(log2.map(_.ipAddress))
       .count()
   }
 

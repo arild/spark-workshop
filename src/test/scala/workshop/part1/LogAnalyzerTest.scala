@@ -39,13 +39,13 @@ class LogAnalyzerTest extends SparkTestUtils with Matchers {
 
     val num404 = LogAnalyzer.countAllDistinctIpAddressesForStatusCode(
       openAccessLog(ACCESS_LOG_1), openAccessLog(ACCESS_LOG_2), 404)
-    num404 shouldBe 9
+    num404 shouldBe 8
   }
 
   sparkTest("find num ip addresses occurring in both logs") {
     val num = LogAnalyzer.findNumIpAddressesOccurringInBothLogs(openAccessLog(ACCESS_LOG_1), openAccessLog(ACCESS_LOG_2))
 
-    num shouldBe 3
+    num shouldBe 9
   }
 
   sparkTest("find num ip addresses occurring more than once") {
