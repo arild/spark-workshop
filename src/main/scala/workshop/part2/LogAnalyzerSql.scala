@@ -1,7 +1,9 @@
 package workshop.part2
 
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import workshop.util.parser.{AccessLogParser, HttpStatusParser}
+
 
 object LogAnalyzerSql {
 
