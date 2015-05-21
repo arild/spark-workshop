@@ -337,6 +337,21 @@ res.foreach(row => println(row.getString(0)))</pre>
         </article>
     </slide>
 
+    <slide>
+        <hgroup>
+            <h2>Part 3 - Run programs</h2>
+        </hgroup>
+        <article class="large">
+            <ul>
+                <li>Run access log generator<br /><br />
+                <pre class="prettyprint">$ ./sbt 'run-main workshop.part3.AccessLogGenerator' </pre>
+                </li>
+                <li>Run spark application<br /><br />
+                    <pre class="prettyprint">$ ./sbt 'run-main workshop.part3.StreamingLogAnalyzer'</pre></li>
+            </ul>
+        </article>
+    </slide>
+
     <slide class="thank-you-slide segue nobackground">
         <article class="flexbox vleft">
             <h2>Thanks!</h2>
