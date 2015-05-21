@@ -7,7 +7,6 @@ object LogAnalyzerSql {
 
   def createTables(sc: SparkContext, accessLog: String, httpStatus: String): DataFrame = ???
 
-
   def countStatus200Loglines(df: DataFrame): Long = ???
 
   def findThreeMostFrequentIpAddresses(df: DataFrame): Array[String] = ???
